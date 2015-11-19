@@ -1,0 +1,9 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:key="disabled_mode"
+        android:title="disabled mode"
+        android:summary="get more detailed instructions"
+        android:defaultValue="false" />
+
+</PreferenceScreen>

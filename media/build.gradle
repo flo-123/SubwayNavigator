@@ -1,0 +1,11 @@
+apply plugin: 'java'
+
+version '1.8.1'
+group   'com.yourcompany.package'
+
+sourceCompatibility = JavaVersion.VERSION_1_6
+targetCompatibility = JavaVersion.VERSION_1_6
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
