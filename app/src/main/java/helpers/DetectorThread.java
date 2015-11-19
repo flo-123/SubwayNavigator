@@ -191,6 +191,7 @@ public class DetectorThread extends Thread{
             }
         } catch (Exception e) {
             e.printStackTrace();
+
         }
     }
 
