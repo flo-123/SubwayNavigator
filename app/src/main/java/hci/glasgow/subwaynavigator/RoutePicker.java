@@ -21,7 +21,9 @@ import android.widget.NumberPicker;
 import java.util.List;
 
 import helpers.HelperFunctions;
+import helpers.NotificationManager;
 import model.GlasgowSubwayStops;
+import model.ScotrailStops;
 import model.Stop;
 import model.Stops;
 
@@ -35,8 +37,23 @@ public class RoutePicker extends AppCompatActivity implements StartStopPickerFra
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_route_picker);
+    }
 
-        stops = new GlasgowSubwayStops();
+    private void init() {
+
+        int line = MyApp.getLine();
+
+        switch (line) {
+            case 1: //Glasgow Subway
+                stops = new GlasgowSubwayStops();
+                break;
+            case 2: //Scotrail
+                stops = new ScotrailStops();
+                break;
+            default:
+                stops = new GlasgowSubwayStops();
+        }
+
 
         StartStopPickerFragement newFragment = new StartStopPickerFragement();
         newFragment.stops = stops;
@@ -48,7 +65,6 @@ public class RoutePicker extends AppCompatActivity implements StartStopPickerFra
         transaction.replace(R.id.fragment_container, newFragment);
 
         transaction.commit();
-
     }
 
     @Override
@@ -57,6 +73,16 @@ public class RoutePicker extends AppCompatActivity implements StartStopPickerFra
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.settings_menu, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        FragmentManager fm = this.getSupportFragmentManager();
+        for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+            fm.popBackStack();
+        }
+        init();
     }
 
     @Override

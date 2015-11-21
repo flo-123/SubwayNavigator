@@ -16,7 +16,6 @@ public class GlasgowSubwayStops extends Stops implements Serializable {
     }
 
 
-
     protected void generateStops() {
         stops.add(new Stop("Partick"));
         stops.add(new Stop("Kelvinhall"));

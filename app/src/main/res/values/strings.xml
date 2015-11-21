@@ -7,4 +7,13 @@
 
     <string name="pref_header_debug">Debug</string>
 
+    <string-array name="line_list_titles">
+        <item>Glasgow Subway</item>
+        <item>Scotrail</item>
+    </string-array>
+    <string-array name="line_list_values">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
 </resources>

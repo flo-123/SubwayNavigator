@@ -5,4 +5,35 @@
         android:title="debug mode"
         android:defaultValue="false" />
 
+    <EditTextPreference
+        android:key="sample_length"
+        android:title="sample length in sec"
+        android:defaultValue="1"
+        android:numeric="integer" />
+
+    <EditTextPreference
+        android:key="match_score"
+        android:title="match score between 1 and 0"
+        android:defaultValue="0.5"
+        android:numeric="decimal" />
+
+    <EditTextPreference
+        android:key="time_between_stops"
+        android:title="least amount of times in between stops in sec"
+        android:defaultValue="10"
+        android:numeric="integer" />
+
+    <EditTextPreference
+        android:key="detected_sounds_threshold"
+        android:title="least amount of beeps that need to be registered"
+        android:defaultValue="2"
+        android:numeric="integer" />
+
+    <EditTextPreference
+        android:key="high_pass_filter"
+        android:title="High Pass Filter in Hz"
+        android:defaultValue="3000"
+        android:inputType="number" />
+
+
 </PreferenceScreen>

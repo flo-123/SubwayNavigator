@@ -27,14 +27,17 @@ import java.util.Arrays;
 import java.util.List;
 
 
+import android.app.Activity;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.musicg.wave.Wave;
 import com.musicg.wave.WaveHeader;
 
 import hci.glasgow.subwaynavigator.MyApp;
+import hci.glasgow.subwaynavigator.NavigatorActivity;
 import interfaces.OnSignalsDetectedListener;
 
 
@@ -44,12 +47,9 @@ public class DetectorThread extends Thread{
     private WaveHeader waveHeader;
     private volatile Thread _thread;
     private List<Wave> soundDatabase;
-    public static long SAMPLE_READING_RATE = MyApp.getSampleReadingRate();
-    private static float LEAST_AMOUNT_OF_TIME_IN_BETWEEN_STOPS = 5; //in seconds
-    private static int DETECTED_SOUNDS_THRESHOLD = 2;
-    private static float HIGHPASS_FILTER = 3000f;
     private long lastSoundDetectedAt;
     private int detectedSounds;
+    public NavigatorActivity activity;
 
 
     private OnSignalsDetectedListener onSignalsDetectedListener;
@@ -89,7 +89,7 @@ public class DetectorThread extends Thread{
                 InputStream stream = MyApp.getContext().getResources().openRawResource(resID);
                 Wave wave = new Wave(stream);
 
-                byte[] bytes = HelperFunctions.highPassFilter(wave.getBytes(), wave.getWaveHeader(), HIGHPASS_FILTER);
+                byte[] bytes = HelperFunctions.highPassFilter(wave.getBytes(), wave.getWaveHeader(), MyApp.getHighPassFilter());
                 //HelperFunctions.writeWavFile(HelperFunctions.PCMtoWav(bytes,wave.getWaveHeader().getSampleRate(),wave.getWaveHeader().getChannels(),wave.getWaveHeader().getBitsPerSample()));
                 wave = new Wave(wave.getWaveHeader(),bytes);
 
@@ -119,27 +119,21 @@ public class DetectorThread extends Thread{
 
             Thread thisThread = Thread.currentThread();
             while (_thread == thisThread) {
-                // detect sound
 
                 buffer = recorder.getFrameBytes();
 
                 long timeStamp = System.currentTimeMillis();
-                byte[] combined = new byte[0];
+                byte[] combined;
                 while((System.currentTimeMillis() - timeStamp) / 1000 < MyApp.getSampleReadingRate()) {
-
                     byte[] current = recorder.getFrameBytes();
-
                     combined = new byte[buffer.length + current.length];
-
                     System.arraycopy(buffer,0,combined,0,buffer.length);
                     System.arraycopy(current,0,combined,buffer.length,current.length);
                     buffer = new byte[combined.length];
                     System.arraycopy(combined,0,buffer,0,combined.length);
-
                 }
 
-
-                Log.d("detect","run");
+                Log.d("Detect Thread","run");
 
                 int totalAbsValue = 0;
                 short sample = 0;
@@ -151,8 +145,6 @@ public class DetectorThread extends Thread{
                 }
                 averageAbsValue = totalAbsValue / buffer.length / 2;
 
-                //System.out.println(averageAbsValue);
-
                 // no input
                 if (averageAbsValue < 30){
                     buffer = null;
@@ -161,33 +153,50 @@ public class DetectorThread extends Thread{
                 // audio analyst
                 if (buffer != null && buffer.length > 0) {
 
-                    //buffer = trim(buffer); //remove trailing zeros
+                    Log.d("Detect Thread", "sound detected");
 
-                    Log.d("detect", "sound detected");
-
-                    buffer = HelperFunctions.highPassFilter(buffer, waveHeader, HIGHPASS_FILTER);
+                    buffer = HelperFunctions.highPassFilter(buffer, waveHeader, MyApp.getHighPassFilter());
 
                     byte[] data = HelperFunctions.PCMtoWav(buffer, waveHeader.getSampleRate(), waveHeader.getChannels(), waveHeader.getBitsPerSample());
                     //HelperFunctions.writeWavFile(data);
 
                     Wave wave = new Wave(new ByteArrayInputStream(data));
 
+                    float[] scores = new float[soundDatabase.size()];
+                    int i = 0;
                     for(Wave fromSoundDB : soundDatabase) {
                         float similarity = fromSoundDB.getFingerprintSimilarity(wave).getSimilarity();
-                        Log.d("Fshort", "Value: " + Float.toString(similarity));
+                        Log.d("Score", "Value: " + Float.toString(similarity));
 
-                        if (similarity > 0.5 ) {
-                            if((System.currentTimeMillis() - lastSoundDetectedAt)  * 1000 > LEAST_AMOUNT_OF_TIME_IN_BETWEEN_STOPS) {
-                                if(detectedSounds++ >= DETECTED_SOUNDS_THRESHOLD) {
+                        // Debug
+                        scores[i++] = similarity;
+
+                        if (similarity > MyApp.getMatchScore() ) {
+                            if((System.currentTimeMillis() - lastSoundDetectedAt)  / 1000 > MyApp.getTimeBetweenStops()) {
+                                if(detectedSounds++ >= MyApp.getDetectedSoundsThreshold()) {
                                     onSoundDetected();
                                 }
                             }
                             break;
                         }
                     }
+                    if(MyApp.getDebugMode()) {
+                        if(activity != null) {
+                            String s = "";
+                            for (Float f : scores) {
+                                s += String.format("%.2f", f) + ", ";
+                            }
+                            activity.displayToast(s);
+                        }
+                    }
+                } else {
+
+                    if(MyApp.getDebugMode()) {
+                        if (activity != null) {
+                            activity.displayToast("No sound detected");
+                        }
+                    }
                 }
-                //sleep(SAMPLE_READING_RATE * 1000);
-                //Thread.currentThread().sleep(SAMPLE_READING_RATE * 10000);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -214,7 +223,6 @@ public class DetectorThread extends Thread{
         {
             --i;
         }
-
         return Arrays.copyOf(bytes, i + 1);
     }
 

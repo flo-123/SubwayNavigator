@@ -48,23 +48,42 @@ public abstract class Stops implements Serializable {
 
     public List<Stop> stopsInBetween(Stop startStop, Stop destStop) {
         List<Stop> stopsInBetween = new ArrayList<Stop>();
-        if(!inbound) {
-            reverseStopList();
-        }
         int indexStart = stops.indexOf(startStop);
         int indexDest =  stops.indexOf(destStop);
-        if(indexDest > indexStart) {
-            for (int i = indexStart+1; i <= indexDest; i++) {
-                stopsInBetween.add(stops.get(i));
-            }
-        }
-        else {
-            for (int i = indexDest; i > indexStart; i = (i-1) % stops.size()) {
-                stopsInBetween.add(stops.get(i));
-            }
-            Collections.reverse(stopsInBetween);
-        }
+        if(!inbound) {
+            if(indexDest > indexStart) {
+                for (Stop s : stops.subList(0,indexStart+1)) {
+                    stopsInBetween.add(s);
+                }
+                Collections.reverse(stopsInBetween);
 
+                for (Stop s : stops.subList(indexDest,stops.size()-1)) {
+                    stopsInBetween.add(s);
+                }
+                Collections.reverse(stopsInBetween);
+            }
+            else {
+                for (int i = indexStart; i >= indexDest; i--) {
+                    stopsInBetween.add(stops.get(i));
+                }
+            }
+        } else {
+            if(indexDest > indexStart) {
+                for (int i = indexStart+1; i <= indexDest; i++) {
+                    stopsInBetween.add(stops.get(i));
+                }
+            }
+            else {
+                for (Stop s : stops.subList(indexStart,stops.size())) {
+                    stopsInBetween.add(s);
+                }
+
+                for (Stop s : stops.subList(0 ,indexDest)) {
+                    stopsInBetween.add(s);
+                }
+
+            }
+        }
         return stopsInBetween;
     }
 

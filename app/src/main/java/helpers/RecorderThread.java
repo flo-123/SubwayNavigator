@@ -34,15 +34,7 @@ public class RecorderThread extends Thread {
 	private int channelConfiguration = AudioFormat.CHANNEL_IN_MONO;
 	private int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
 	private int sampleRate = 44100;
-	//private int sampleRate = 11025;
-	//private int frameByteSize = 2048; // for 1024 fft size (16bit sample size)
-	//private int frameByteSize = 110250;
-	//private int frameByteSize = 220500;
-	//private int frameByteSize = 32768;
-	//private int frameByteSize = 8192;
-	//private int frameByteSize = (int)(sampleRate * 2 * 2 * 1);
-	//private int frameByteSize = (sampleRate*16*1)/8;
-	private int frameByteSize = 11025;
+	private int frameByteSize;
 	byte[] buffer;
 
 	private AudioRecord.OnRecordPositionUpdateListener updateListener = new AudioRecord.OnRecordPositionUpdateListener(){
@@ -58,9 +50,8 @@ public class RecorderThread extends Thread {
 	};
 	
 	public RecorderThread(){
-		int recBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfiguration, audioEncoding); // need to be larger than size of a frame
+		int recBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfiguration, audioEncoding);
 		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfiguration, audioEncoding, recBufSize);
-		//audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfiguration, audioEncoding, frameByteSize);
 		frameByteSize = recBufSize;
 		buffer = new byte[frameByteSize];
 	}
@@ -93,25 +84,6 @@ public class RecorderThread extends Thread {
 	
 	public byte[] getFrameBytes(){
 		audioRecord.read(buffer, 0, frameByteSize);
-		// analyze sound
-		/*
-		int totalAbsValue = 0;
-        short sample = 0; 
-        float averageAbsValue = 0.0f;
-
-        for (int i = 0; i < frameByteSize; i += 2) {
-            sample = (short)((buffer[i]) | buffer[i + 1] << 8);
-            totalAbsValue += Math.abs(sample);
-        }
-        averageAbsValue = totalAbsValue / frameByteSize / 2;
-
-        //System.out.println(averageAbsValue);
-        
-        // no input
-        if (averageAbsValue < 30){
-        	return null;
-        }
-		*/
 		return buffer;
 	}
 	

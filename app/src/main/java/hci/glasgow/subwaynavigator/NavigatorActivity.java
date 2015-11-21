@@ -1,5 +1,6 @@
 package hci.glasgow.subwaynavigator;
 
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Color;
@@ -15,18 +16,22 @@ import android.view.MenuItem;
 import android.widget.NumberPicker;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.musicg.wave.Wave;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Locale;
 
 import gui.VerticalSeekBar;
 import helpers.DetectorThread;
 import helpers.RecorderThread;
+import helpers.SpeechManager;
 import interfaces.OnSignalsDetectedListener;
 import model.Stop;
 import model.Stops;
+import helpers.NotificationManager;
 
 public class NavigatorActivity extends AppCompatActivity implements OnSignalsDetectedListener {
 
@@ -38,6 +43,8 @@ public class NavigatorActivity extends AppCompatActivity implements OnSignalsDet
     private RecorderThread recorderThread;
     private List<Stop> stopsInBetween;
     private VerticalSeekBar seekBar;
+    private SpeechManager speechManager;
+    private Toast toast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +83,10 @@ public class NavigatorActivity extends AppCompatActivity implements OnSignalsDet
         recorderThread.start();
         detectorThread = new DetectorThread(recorderThread);
         detectorThread.setOnSignalsDetectedListener(this);
+        detectorThread.activity = this;
         detectorThread.start();
+
+        speechManager = new SpeechManager();
     }
 
     protected void onDestroy() {
@@ -97,7 +107,7 @@ public class NavigatorActivity extends AppCompatActivity implements OnSignalsDet
 
         runOnUiThread(new Runnable() {
             public void run() {
-                if (stopsLeft > 0) {
+                if (stopsLeft >= 0) {
                     stopsLeft--;
                     stopsLeftText = (TextView) findViewById(R.id.stops_left);
                     stopsLeftText.setText(stopsLeft.toString());
@@ -107,17 +117,26 @@ public class NavigatorActivity extends AppCompatActivity implements OnSignalsDet
                     if (index >= 0 && index < stopsInBetween.size()) {
                         currentStopText.setText(stopsInBetween.get(index).getName());
                     }
-                } else {
-                    //reached destination
-                    if (recorderThread != null) {
-                        recorderThread.stopRecording();
-                        recorderThread = null;
+                    if(stopsLeft == 1) {
+                        NotificationManager.createNotification(null, "Destination coming up!", "Please get off the next stop");
+                        speechManager.speak("1 station to go. You are almost at your destination.");
+                    } else {
+                        speechManager.speak("Don't get off." + "You have" + stopsLeft.toString() + "stations left to go.");
                     }
-                    if (detectorThread != null) {
-                        detectorThread.stopDetection();
-                        detectorThread = null;
-                    }
+                    if (stopsLeft == 0) {
+                        //reached destination
+                        if (recorderThread != null) {
+                            recorderThread.stopRecording();
+                            recorderThread = null;
+                        }
+                        if (detectorThread != null) {
+                            detectorThread.stopDetection();
+                            detectorThread = null;
+                        }
 
+                        NotificationManager.createNotification(null,"You've reached your destination!","Don't miss your stop");
+                        speechManager.speak("Please get off. This is your stop. Please get off.");
+                    }
                 }
             }
         });
@@ -129,6 +148,9 @@ public class NavigatorActivity extends AppCompatActivity implements OnSignalsDet
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.settings_menu, menu);
+        if(MyApp.getDebugMode()) {
+            inflater.inflate(R.menu.debug_menu, menu);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -144,6 +166,29 @@ public class NavigatorActivity extends AppCompatActivity implements OnSignalsDet
             Intent i = new Intent(this, AppSettingsActivity.class);
             startActivityForResult(i, 1);
         }
+
+        if (id==R.id.action_next_stop) {
+            if(stopsLeft > 0) {
+                onSoundDetected();
+            }
+
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void displayToast(final String s) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                setTitle(s);
+                /*
+                if(toast != null)
+                {
+                    toast.cancel();
+                }
+                toast = Toast.makeText(MyApp.getContext(), s, Toast.LENGTH_SHORT);
+                toast.show();
+                */
+            }
+        });
     }
 }
