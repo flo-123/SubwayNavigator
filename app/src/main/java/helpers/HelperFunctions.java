@@ -26,14 +26,23 @@ public abstract class HelperFunctions {
 
     private static int currentSoundFileID = 1000;
 
-    public static Stop getStopFromPicker(NumberPicker picker, Stops stops) {
+    public static Stop getStopFromPicker(NumberPicker picker, Stops stops, boolean inbound) {
         String selection = picker.getDisplayedValues()[picker.getValue()];
-        for (Stop s : stops.getStops()) {
-            if(s.getName().equals(selection)) {
-                return s;
+        if(!inbound) {
+            for (Stop s : stops.getStops()) {
+                if(s.getName().equals(selection)) {
+                    return s;
+                }
             }
+            return  stops.getStops().get(0);
+        } else {
+            for (Stop s : stops.getStopsIn()) {
+                if(s.getName().equals(selection)) {
+                    return s;
+                }
+            }
+            return  stops.getStopsIn().get(0);
         }
-        return  stops.getStops().get(0);
     }
 
     public static byte[] PCMtoWav(byte[] data, int srate, int channel, int format){

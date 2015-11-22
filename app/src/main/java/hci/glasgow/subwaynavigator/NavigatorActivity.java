@@ -74,7 +74,7 @@ public class NavigatorActivity extends AppCompatActivity implements OnSignalsDet
         destStopText.setText(destStop.getName());
 
         currentStopText = (TextView)findViewById(R.id.current);
-        currentStopText.setText(startStop.getName());
+        currentStopText.setText(stopsInBetween.get(0).getName());
 
         seekBar = (VerticalSeekBar) findViewById(R.id.seekBarProgress);
         seekBar.setMax(100);
@@ -113,7 +113,7 @@ public class NavigatorActivity extends AppCompatActivity implements OnSignalsDet
                     stopsLeftText.setText(stopsLeft.toString());
                     seekBar.setProgress(100 - (100 / stopsInBetween.size() * stopsLeft));
                     seekBar.updateThumb();
-                    int index = stopsInBetween.size() - stopsLeft - 1;
+                    int index = stopsInBetween.size() - stopsLeft;
                     if (index >= 0 && index < stopsInBetween.size()) {
                         currentStopText.setText(stopsInBetween.get(index).getName());
                     }

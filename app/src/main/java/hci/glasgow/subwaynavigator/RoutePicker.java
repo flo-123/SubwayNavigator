@@ -114,16 +114,28 @@ public class RoutePicker extends AppCompatActivity implements StartStopPickerFra
 
     @Override
     public void destinatinStopSelected(Stop stop, boolean inbound) {
-
         destStop = stop;
         stops.setInbound(inbound);
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.putExtra("start", startStop);
-        intent.putExtra("destination", destStop);
-        intent.putExtra("stops", stops);
-        MyApp.setPathToSoundFiles(stops.getPathToSoundFiles());
-        intent.setClassName("hci.glasgow.subwaynavigator", "hci.glasgow.subwaynavigator.NavigatorActivity");
-        startActivity(intent);
+        if(stops.stopsInBetween(startStop,destStop) == null) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Selected stops seem to be incorrect")
+                    .setMessage("please check your values")
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        } else {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.putExtra("start", startStop);
+            intent.putExtra("destination", destStop);
+            intent.putExtra("stops", stops);
+            MyApp.setPathToSoundFiles(stops.getPathToSoundFiles());
+            intent.setClassName("hci.glasgow.subwaynavigator", "hci.glasgow.subwaynavigator.NavigatorActivity");
+            startActivity(intent);
+        }
 
     }
 

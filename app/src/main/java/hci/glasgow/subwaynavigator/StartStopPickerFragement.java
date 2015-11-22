@@ -39,14 +39,14 @@ public class StartStopPickerFragement extends Fragment {
         final NumberPicker picker = (NumberPicker) view.findViewById(R.id.start);
         picker.setMinValue(0);
         picker.setMaxValue(stops.getStops().size() - 1);
-        picker.setDisplayedValues(stops.getStringArrayOfStopsStartingFrom(stops.getStops().get(0)));
+        picker.setDisplayedValues(stops.getStringArrayOfStopsStartingFrom(stops.getStops().get(0),false));
         HelperFunctions.setDividerColor(picker, getResources().getColor(R.color.colorAccent));
 
         Button destination = (Button)view.findViewById(R.id.pick_destination);
         destination.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Stop startStop = HelperFunctions.getStopFromPicker(picker,stops);
+                Stop startStop = HelperFunctions.getStopFromPicker(picker,stops,false);
                 onButtonPressed(startStop);
             }
         });

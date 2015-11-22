@@ -29,7 +29,7 @@ public class DestinationStopPickerFragement extends Fragment {
     private String[] listOfStops;
     private NumberPicker picker;
     private View view;
-    private boolean inbound = true;
+    private boolean inbound = false;
 
     public DestinationStopPickerFragement() {
         // Required empty public constructor
@@ -42,7 +42,7 @@ public class DestinationStopPickerFragement extends Fragment {
         view = inflater.inflate(R.layout.fragment_destination_stop_picker_fragement, container, false);
 
 
-        listOfStops = stops.getStringArrayOfStopsStartingFrom(stops.getStops().get(stops.getStops().indexOf(startStop)));
+        listOfStops = stops.getStringArrayOfStopsStartingFrom(stops.getStops().get(stops.getStops().indexOf(startStop)),inbound);
         picker = (NumberPicker)view.findViewById(R.id.destination);
         picker.setMinValue(0);
         picker.setMaxValue(listOfStops.length - 1);
@@ -53,7 +53,7 @@ public class DestinationStopPickerFragement extends Fragment {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Stop destStop = HelperFunctions.getStopFromPicker(picker, stops);
+                Stop destStop = HelperFunctions.getStopFromPicker(picker, stops,inbound);
                 onButtonPressed(destStop,inbound);
             }
         });
@@ -67,13 +67,12 @@ public class DestinationStopPickerFragement extends Fragment {
 
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-
-                toggleDirection();
                 if (checkedId == R.id.radio_inbound) {
                     inbound = true;
                 } else if (checkedId == R.id.radio_outgoing) {
                     inbound = false;
                 }
+                toggleDirection();
 
             }
 
@@ -120,7 +119,7 @@ public class DestinationStopPickerFragement extends Fragment {
     }
 
     private void toggleDirection() {
-        listOfStops = reverse(listOfStops);
+        listOfStops = stops.getStringArrayOfStopsStartingFrom(stops.getStops().get(stops.getStops().indexOf(startStop)),inbound);
         picker = (NumberPicker)view.findViewById(R.id.destination);
         picker.setMinValue(0);
         picker.setDisplayedValues(null);
@@ -128,14 +127,4 @@ public class DestinationStopPickerFragement extends Fragment {
         picker.setDisplayedValues(listOfStops);
         picker.setValue(0);
     }
-
-    private String[] reverse(String[] input) {
-        String [] output = new String[input.length];
-        output[0] = input[0];
-        for (int i = 1; i < input.length; i++) {
-            output[input.length-i] = input[i];
-        }
-        return output;
-    }
-
 }

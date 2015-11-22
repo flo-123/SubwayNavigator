@@ -32,6 +32,22 @@ public class GlasgowSubwayStops extends Stops implements Serializable {
         stops.add(new Stop("Cessnock"));
         stops.add(new Stop("Ibrox"));
         stops.add(new Stop("Govan"));
+
+        stopsIn.add(new Stop("Govan"));
+        stopsIn.add(new Stop("Ibrox"));
+        stopsIn.add(new Stop("Cessnock"));
+        stopsIn.add(new Stop("Kinning Park"));
+        stopsIn.add(new Stop("Shields Road"));
+        stopsIn.add(new Stop("West Street"));
+        stopsIn.add(new Stop("Bridge Street"));
+        stopsIn.add(new Stop("St Enoch"));
+        stopsIn.add(new Stop("Buchanan Street"));
+        stopsIn.add(new Stop("Cowcaddens"));
+        stopsIn.add(new Stop("St George's Cross"));
+        stopsIn.add(new Stop("Kelvinbridge"));
+        stopsIn.add(new Stop("Hillhead"));
+        stopsIn.add(new Stop("Kelvinhall"));
+        stopsIn.add(new Stop("Partick"));
     }
 
     @Override

@@ -31,6 +31,23 @@ public class ScotrailStops extends Stops implements Serializable {
         stops.add(new Stop("Prestwick Town"));
         stops.add(new Stop("Newton-On-Ayr"));
         stops.add(new Stop("Ayr Station"));
+
+        stopsIn.add(new Stop("Ayr Station"));
+        stopsIn.add(new Stop("Newton-On-Ayr"));
+        stopsIn.add(new Stop("Prestwick Town"));
+        stopsIn.add(new Stop("Prestwick Int. Airport"));
+        stopsIn.add(new Stop("Troon"));
+        stopsIn.add(new Stop("Barassie"));
+        stopsIn.add(new Stop("Irvine"));
+        stopsIn.add(new Stop("Kilwinning"));
+        stopsIn.add(new Stop("Dalry"));
+        stopsIn.add(new Stop("Glengarnock"));
+        stopsIn.add(new Stop("Lochwinnoch"));
+        stopsIn.add(new Stop("Howwood"));
+        stopsIn.add(new Stop("Milliken Park"));
+        stopsIn.add(new Stop("Johnstone"));
+        stopsIn.add(new Stop("Paisley Gilmour Street"));
+        stopsIn.add(new Stop("Glasgow Central"));
     }
 
     @Override

@@ -10,10 +10,12 @@ import java.util.List;
  */
 public abstract class Stops implements Serializable {
     protected List<Stop> stops;
+    protected List<Stop> stopsIn;
     protected boolean inbound;
 
     public Stops() {
         stops = new ArrayList<Stop>();
+        stopsIn = new ArrayList<Stop>();
         generateStops();
     }
 
@@ -22,66 +24,63 @@ public abstract class Stops implements Serializable {
     public List<Stop> getStops() {
         return stops;
     }
-
-    public String[] getStringArrayOfStopsStartingFrom(Stop stop) {
-        String[] stringArrayOfStops =  new String[stops.size()];
-        int indexOfStartStop = 0;
-        for(int i = 0; i < stops.size(); i++) {
-            if (stops.get(i).equals(stop)) {
-                indexOfStartStop = i;
-            }
-        }
-        for(int i = 0; i < stops.size(); i++) {
-            int j = (i + indexOfStartStop) % stops.size();
-            stringArrayOfStops[i] = stops.get(j).getName();
-        }
-        return stringArrayOfStops;
+    public List<Stop> getStopsIn() {
+        return stopsIn;
     }
 
-    public void reverseStopList () {
-        List<Stop> newStops = new ArrayList<Stop>(stops.size());
-        for(int i = 1; i <= stops.size(); i++) {
-            newStops.add(stops.get(stops.size()-i));
+    public String[] getStringArrayOfStopsStartingFrom(Stop stop, boolean inbound) {
+        if(!inbound) {
+            String[] stringArrayOfStops =  new String[stops.size()];
+            int indexOfStartStop = 0;
+            for(int i = 0; i < stops.size(); i++) {
+                if (stops.get(i).equals(stop)) {
+                    indexOfStartStop = i;
+                }
+            }
+            for(int i = 0; i < stops.size(); i++) {
+                int j = (i + indexOfStartStop) % stops.size();
+                stringArrayOfStops[i] = stops.get(j).getName();
+            }
+            return stringArrayOfStops;
+        } else {
+            String[] stringArrayOfStops =  new String[stopsIn.size()];
+            int indexOfStartStop = 0;
+            for(int i = 0; i < stopsIn.size(); i++) {
+                if (stopsIn.get(i).equals(stop)) {
+                    indexOfStartStop = i;
+                }
+            }
+            for(int i = 0; i < stopsIn.size(); i++) {
+                int j = (i + indexOfStartStop) % stopsIn.size();
+                stringArrayOfStops[i] = stopsIn.get(j).getName();
+            }
+            return stringArrayOfStops;
         }
-        stops = newStops;
     }
 
     public List<Stop> stopsInBetween(Stop startStop, Stop destStop) {
         List<Stop> stopsInBetween = new ArrayList<Stop>();
-        int indexStart = stops.indexOf(startStop);
-        int indexDest =  stops.indexOf(destStop);
         if(!inbound) {
-            if(indexDest > indexStart) {
-                for (Stop s : stops.subList(0,indexStart+1)) {
-                    stopsInBetween.add(s);
-                }
-                Collections.reverse(stopsInBetween);
-
-                for (Stop s : stops.subList(indexDest,stops.size()-1)) {
-                    stopsInBetween.add(s);
-                }
-                Collections.reverse(stopsInBetween);
-            }
-            else {
-                for (int i = indexStart; i >= indexDest; i--) {
-                    stopsInBetween.add(stops.get(i));
-                }
-            }
-        } else {
+            int indexStart = getIndexOfStopByName(startStop.getName(), false);
+            int indexDest =  getIndexOfStopByName(destStop.getName(),false);
             if(indexDest > indexStart) {
                 for (int i = indexStart+1; i <= indexDest; i++) {
                     stopsInBetween.add(stops.get(i));
                 }
             }
             else {
-                for (Stop s : stops.subList(indexStart,stops.size())) {
-                    stopsInBetween.add(s);
+                return null;
+            }
+        } else {
+            int indexStart = getIndexOfStopByName(startStop.getName(), true);
+            int indexDest =  getIndexOfStopByName(destStop.getName(),true);
+            if(indexDest > indexStart) {
+                for (int i = indexStart+1; i <= indexDest; i++) {
+                    stopsInBetween.add(stopsIn.get(i));
                 }
-
-                for (Stop s : stops.subList(0 ,indexDest)) {
-                    stopsInBetween.add(s);
-                }
-
+            }
+            else {
+                return null;
             }
         }
         return stopsInBetween;
@@ -96,5 +95,23 @@ public abstract class Stops implements Serializable {
     }
 
     public abstract String getPathToSoundFiles();
+
+    private int getIndexOfStopByName(String stopName, boolean inbound) {
+        int index = -1;
+        if(inbound) {
+            for(int i = 0; i < stopsIn.size(); i++) {
+                if(stopsIn.get(i).getName().equals(stopName)) {
+                    index = i;
+                }
+            }
+        } else {
+            for(int i = 0; i < stops.size(); i++) {
+                if(stops.get(i).getName().equals(stopName)) {
+                    index = i;
+                }
+            }
+        }
+        return index;
+    }
 
 }
