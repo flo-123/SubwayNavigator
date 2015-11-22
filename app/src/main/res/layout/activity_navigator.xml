@@ -63,8 +63,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15dp"
-                    android:text="Your destination is:"/>
+                    android:textSize="20dp"
+                    android:text="Destination:"/>
 
                 <TextView
                     android:id="@+id/destination"
@@ -83,8 +83,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15dp"
-                    android:text="The current station is:"/>
+                    android:textSize="20dp"
+                    android:text="Next stop:"/>
 
                 <TextView
                     android:id="@+id/current"
@@ -103,8 +103,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15dp"
-                    android:text="You started from:"/>
+                    android:textSize="20dp"
+                    android:text="Start:"/>
 
                 <TextView
                     android:id="@+id/start"
